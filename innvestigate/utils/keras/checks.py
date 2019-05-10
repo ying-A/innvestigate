@@ -368,6 +368,11 @@ def is_relu_convnet_layer(layer):
     return (is_convnet_layer(layer) and only_relu_activation(layer))
 
 
+def is_embedding(layer):
+    """Checks if layer is an embedding layer."""
+    return isinstance(layer, keras.layers.embeddings.Embedding)
+
+
 def is_average_pooling(layer):
     """Checks if layer is an average-pooling layer."""
     AVERAGEPOOLING_LAYERS = (

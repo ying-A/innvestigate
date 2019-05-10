@@ -978,6 +978,7 @@ def reverse_model(model, reverse_mappings,
                 # Nothing meta here
                 reverse_mapping = meta_reverse_mapping
 
+        print("[Info] Apply {} to {}.".format(reverse_mapping, layer.name))
         initialized_reverse_mappings[layer] = reverse_mapping
 
     if project_bottleneck_tensors:
@@ -994,6 +995,7 @@ def reverse_model(model, reverse_mappings,
 
     # Follow the list and revert the graph.
     for _nid, (layer, Xs, Ys) in enumerate(reverse_execution_list):
+        print('[Info] revert {}.'.format(layer.name))
         nid = len_execution_list_wo_inputs_layers - _nid - 1
 
         if isinstance(layer, keras.layers.InputLayer):

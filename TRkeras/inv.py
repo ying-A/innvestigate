@@ -81,8 +81,8 @@ with open ('./Data8k/gen_accu_maxdecode.txt', 'w') as fgen:
     fgen.write(str(np.mean(acc)))
 '''
 tensor_to_analyze = [s2s.src_emb,s2s.tgt_emb,s2s.src_pos_emb,s2s.tgt_pos_emb]
-#methods = ["gradient"]
-methods = ["gradient.baseline"]
+methods = ["gradient"]
+#methods = ["gradient.baseline"]
 kwargs = [{'tensor_to_analyze':tensor_to_analyze}]
 
 

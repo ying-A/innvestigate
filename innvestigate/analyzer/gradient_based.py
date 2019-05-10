@@ -92,6 +92,15 @@ class BaselineGradient(base.AnalyzerNetworkBase):
         return kwargs
 
 
+class ReverseEmbeddingLayer(kgraph.ReverseMappingBase):
+
+    def __init__(self, layer, state):
+        pass
+
+    def apply(self, Xs, Ys, reversed_Ys, reverse_state):
+        return ilayers.Sum()(reversed_Ys)
+
+
 class Gradient(base.ReverseAnalyzerBase):
     """Gradient analyzer.
 
@@ -111,6 +120,16 @@ class Gradient(base.ReverseAnalyzerBase):
         self._add_model_softmax_check()
 
         super(Gradient, self).__init__(model, **kwargs)
+
+    def _create_analysis(self, *args, **kwargs):
+
+        self._add_conditional_reverse_mapping(
+            kchecks.is_embedding,
+            ReverseEmbeddingLayer,
+            name="sum_of_embedding",
+        )
+
+        return super(Gradient, self)._create_analysis(*args, **kwargs)
 
     def _head_mapping(self, X):
         return ilayers.OnesLike()(X)
