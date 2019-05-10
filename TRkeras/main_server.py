@@ -1,4 +1,4 @@
-from Data8k import dataloader as dd
+from TRkeras.Data8k import dataloader as dd
 from keras.optimizers import *
 from keras.callbacks import *
 from keras.utils.vis_utils import plot_model
@@ -19,7 +19,7 @@ print('train shapes:', Xtrain.shape, Ytrain.shape)
 print('valid shapes:', Xvalid.shape, Yvalid.shape)
 
 #from transformer_with_input_emb import Transformer, LRSchedulerPerStep
-from transformer import Transformer, LRSchedulerPerStep
+from .transformer import Transformer, LRSchedulerPerStep
 
 d_model = 256
 s2s = Transformer(itokens, otokens, len_limit=70, d_model=d_model, d_inner_hid=512, \
