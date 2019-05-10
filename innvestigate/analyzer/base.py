@@ -529,6 +529,24 @@ class AnalyzerNetworkBase(AnalyzerBase):
         return kwargs
 
 
+class ReverseEmbeddingLayer(kgraph.ReverseMappingBase):
+
+    def __init__(self, layer, state):
+        pass
+
+    def apply(self, Xs, Ys, reversed_Ys, reverse_state):
+        return ilayers.Sum()(reversed_Ys[0])
+
+
+class ReversePassLayer(kgraph.ReverseMappingBase):
+
+    def __init__(self, layer, state):
+        pass
+
+    def apply(self, Xs, Ys, reversed_Ys, reverse_state):
+        return reversed_Ys[0]
+
+
 class ReverseAnalyzerBase(AnalyzerNetworkBase):
     """Convenience class for analyzers that revert the model's structure.
 
@@ -706,6 +724,19 @@ class ReverseAnalyzerBase(AnalyzerNetworkBase):
             return_all_reversed_tensors=return_all_reversed_tensors)
 
     def _create_analysis(self, model, stop_analysis_at_tensors=[]):
+
+        self._add_conditional_reverse_mapping(
+            lambda layer: layer.name in ['lambda_2', 'lambda_4'],
+            ReversePassLayer,
+            name="pass",
+        )
+
+        self._add_conditional_reverse_mapping(
+            kchecks.is_embedding,
+            ReverseEmbeddingLayer,
+            name="sum_of_embedding",
+        )
+
         return_all_reversed_tensors = (
             self._reverse_check_min_max_values or
             self._reverse_check_finite or

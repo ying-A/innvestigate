@@ -263,9 +263,9 @@ class Transformer:
         tgt_seq_input = Input(shape=(17,), dtype='int32')
         src_seq = src_seq_input
         #lambda2
-        tgt_seq = Lambda(lambda x: x[:, :-1])(tgt_seq_input)
+        tgt_seq = Lambda(lambda x: x[:, :-1], output_shape=lambda x: [x[0], x[1]-1])(tgt_seq_input)
         #lambda3
-        tgt_true = Lambda(lambda x: x[:, 1:])(tgt_seq_input)
+        tgt_true = Lambda(lambda x: x[:, 1:], output_shape=lambda x: [x[0], x[1]-1])(tgt_seq_input)
         #print(tgt_true)
         src_emb = self.i_word_emb(src_seq)
         self.src_emb = src_emb
