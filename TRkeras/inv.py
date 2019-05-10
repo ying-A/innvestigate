@@ -5,7 +5,7 @@ import innvestigate
 import tensorflow as tf
 
 import numpy as np
-from keras.utils.vis_utils import plot_model
+#from keras.utils.vis_utils import plot_model
 
 dict_file = './Data8k/vocab.txt'
 itokens, otokens = dd.MakeS2SDict(dict_file)
@@ -80,8 +80,9 @@ with open ('./Data8k/gen_accu_maxdecode.txt', 'w') as fgen:
         acc.append(cnt/len(pred))
     fgen.write(str(np.mean(acc)))
 '''
-tensor_to_analyze = [s2s.i_word_emb,s2s.o_word_emb,s2s.pos_emb]
-methods = ["input_t_gradient"]
+tensor_to_analyze = [s2s.src_emb,s2s.tgt_emb,s2s.src_pos_emb,s2s.tgt_pos_emb]
+#methods = ["gradient"]
+methods = ["gradient.baseline"]
 kwargs = [{'tensor_to_analyze':tensor_to_analyze}]
 
 
@@ -91,7 +92,7 @@ analyzers = []
 for method, kws in zip(methods, kwargs):
     an = []
     for j in range(16):
-        plot_model(s2s.permodel[j],to_file="./modelpng/permodel_%d.png"%j,show_layer_names=True,show_shapes=True)
+        #plot_model(s2s.permodel[j],to_file="./modelpng/permodel_%d.png"%j,show_layer_names=True,show_shapes=True)
         analyzer = innvestigate.create_analyzer(method, s2s.permodel[j], **kws)
         analyzer.fit([Xtrain,Ytrain], batch_size=64, verbose=1)
         an.append(analyzer)

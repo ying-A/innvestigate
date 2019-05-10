@@ -268,9 +268,11 @@ class Transformer:
         tgt_true = Lambda(lambda x: x[:, 1:])(tgt_seq_input)
         #print(tgt_true)
         src_emb = self.i_word_emb(src_seq)
+        self.src_emb = src_emb
 
         #print(src_emb)
         tgt_emb = self.o_word_emb(tgt_seq)
+        self.tgt_emb = tgt_emb
         '''
         self.source_emb_model = Model([src_seq_input], src_emb)
         self.source_emb_pos_model = Model([src_seq_input], self.pos_emb(src_seq))
@@ -280,10 +282,12 @@ class Transformer:
 
         #print(self.pos_emb(src_seq))
         if self.pos_emb:
+            self.src_pos_emb = self.pos_emb(src_seq)
+            self.tgt_pos_emb = self.pos_emb(tgt_seq)
             #lambda1 16,256
-            src_emb = add_layer([src_emb, self.pos_emb(src_seq)])
+            src_emb = add_layer([src_emb, self.src_pos_emb])
             #lambda1 11,256
-            tgt_emb = add_layer([tgt_emb, self.pos_emb(tgt_seq)])
+            tgt_emb = add_layer([tgt_emb, self.tgt_pos_emb])
 
 
 
