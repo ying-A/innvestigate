@@ -1,7 +1,8 @@
-from Data8k import dataloader as dd
+from TRkeras.Data8k import dataloader as dd
 from keras.optimizers import *
 from keras.callbacks import *
 import innvestigate
+import tensorflow as tf
 
 import numpy as np
 from keras.utils.vis_utils import plot_model
@@ -27,7 +28,7 @@ print('seq 2 words:', otokens.num())
 print('train shapes:', Xtrain.shape, Ytrain.shape)
 print('valid shapes:', Xvalid.shape, Yvalid.shape)
 
-from transformer import Transformer, LRSchedulerPerStep
+from TRkeras.transformer import Transformer, LRSchedulerPerStep
 
 d_model = 256
 s2s = Transformer(itokens, otokens, len_limit=70, d_model=d_model, d_inner_hid=512, \
@@ -79,8 +80,12 @@ with open ('./Data8k/gen_accu_maxdecode.txt', 'w') as fgen:
         acc.append(cnt/len(pred))
     fgen.write(str(np.mean(acc)))
 '''
+tensor_to_analyze = [s2s.i_word_emb,s2s.o_word_emb,s2s.pos_emb]
 methods = ["input_t_gradient"]
-kwargs = [{}]
+kwargs = [{'tensor_to_analyze':tensor_to_analyze}]
+
+
+
 analyzers = []
 
 for method, kws in zip(methods, kwargs):
