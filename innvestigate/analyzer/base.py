@@ -69,7 +69,6 @@ class AnalyzerBase(object):
     def __init__(self, model, disable_model_checks=False):
         self._model = model
         self._disable_model_checks = disable_model_checks
-
         self._do_model_checks()
 
     def _add_model_check(self, check, message, check_type="exception"):
@@ -321,12 +320,15 @@ class AnalyzerNetworkBase(AnalyzerBase):
 
     def __init__(self, model,
                  neuron_selection_mode="max_activation",
-                 allow_lambda_layers=False,
+                 allow_lambda_layers=True,
+                 tensor_to_analyze = [],
+                 stop_analysis_at_tensors=[],
                  **kwargs):
         if neuron_selection_mode not in ["max_activation", "index", "all"]:
             raise ValueError("neuron_selection parameter is not valid.")
         self._neuron_selection_mode = neuron_selection_mode
-
+        self._tensor_to_analyze = tensor_to_analyze
+        self._stop_analysis_at_tensors = stop_analysis_at_tensors
         self._allow_lambda_layers = allow_lambda_layers
         self._add_model_check(
             lambda layer: (not self._allow_lambda_layers and
@@ -348,7 +350,7 @@ class AnalyzerNetworkBase(AnalyzerBase):
             lambda layer: kchecks.contains_activation(
                 layer, activation="softmax"),
             "This analysis method does not support softmax layers.",
-            check_type="exception",
+            check_type="warning",
         )
 
     def _prepare_model(self, model):
@@ -364,7 +366,10 @@ class AnalyzerNetworkBase(AnalyzerBase):
         if len(model_output) > 1:
             raise ValueError("Only models with one output tensor are allowed.")
         analysis_inputs = []
-        stop_analysis_at_tensors = []
+        if len(self._stop_analysis_at_tensors)!=0:
+            stop_analysis_at_tensors = self._stop_analysis_at_tensors
+        else :
+            stop_analysis_at_tensors = []
 
         # Flatten to form (batch_size, other_dimensions):
         if K.ndim(model_output[0]) > 2:
@@ -382,7 +387,8 @@ class AnalyzerNetworkBase(AnalyzerBase):
                 neuron_indexing._keras_history[0])
             analysis_inputs.append(neuron_indexing)
             # The indexing tensor should not be analyzed.
-            stop_analysis_at_tensors.append(neuron_indexing)
+            if len(stop_analysis_at_tensors)==0:
+                stop_analysis_at_tensors.append(neuron_indexing)
 
             l = ilayers.GatherND(name="iNNvestigate_gather_nd")
             model_output = l(model_output+[neuron_indexing])
