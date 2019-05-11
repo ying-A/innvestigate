@@ -322,12 +322,14 @@ class AnalyzerNetworkBase(AnalyzerBase):
                  neuron_selection_mode="max_activation",
                  allow_lambda_layers=True,
                  tensor_to_analyze = [],
+                 methodtype_input = False,
                  stop_analysis_at_tensors=[],
                  **kwargs):
         if neuron_selection_mode not in ["max_activation", "index", "all"]:
             raise ValueError("neuron_selection parameter is not valid.")
         self._neuron_selection_mode = neuron_selection_mode
         self._tensor_to_analyze = tensor_to_analyze
+        self._methodtype_input = methodtype_input
         self._stop_analysis_at_tensors = stop_analysis_at_tensors
         self._allow_lambda_layers = allow_lambda_layers
         self._add_model_check(
@@ -546,6 +548,13 @@ class ReversePassLayer(kgraph.ReverseMappingBase):
     def apply(self, Xs, Ys, reversed_Ys, reverse_state):
         return reversed_Ys[0]
 
+class ReverseEmbeddingAsInputLayer(kgraph.ReverseMappingBase):
+    def __init__(self, layer, state):
+        pass
+
+    def apply(self, Xs, Ys, reversed_Ys, reverse_state):
+        return reversed_Ys[0]
+
 
 class ReverseAnalyzerBase(AnalyzerNetworkBase):
     """Convenience class for analyzers that revert the model's structure.
@@ -724,18 +733,24 @@ class ReverseAnalyzerBase(AnalyzerNetworkBase):
             return_all_reversed_tensors=return_all_reversed_tensors)
 
     def _create_analysis(self, model, stop_analysis_at_tensors=[]):
-
         self._add_conditional_reverse_mapping(
             lambda layer: layer.name in ['lambda_2', 'lambda_4'],
             ReversePassLayer,
             name="pass",
         )
+        if not self._methodtype_input:
+            self._add_conditional_reverse_mapping(
+                kchecks.is_embedding,
+                ReverseEmbeddingLayer,
+             name="sum_of_embedding",
+            )
 
-        self._add_conditional_reverse_mapping(
-            kchecks.is_embedding,
-            ReverseEmbeddingLayer,
-            name="sum_of_embedding",
-        )
+        if self._methodtype_input:
+            self._add_conditional_reverse_mapping(
+                kchecks.is_embedding,
+                ReverseEmbeddingAsInputLayer,
+                name="embedding",
+            )
 
         return_all_reversed_tensors = (
             self._reverse_check_min_max_values or
