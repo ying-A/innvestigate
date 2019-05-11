@@ -92,8 +92,10 @@ class MultiHeadAttention():
 
 
         if mask is not None:
-            # lambda 10 18 30 38 46 54
+            # lambda 10 18 25 30 38 46 54
             mask = Lambda(lambda x: K.repeat_elements(x, n_head, 0))(mask)
+        # head lambda 13 21 25 33 41 49 57
+        # attn dp 2 4 6 7 9 10 lamda 25
         head, attn = self.attention(qs, ks, vs, mask=mask)
 
         def reshape2(x):
@@ -102,7 +104,7 @@ class MultiHeadAttention():
             x = tf.transpose(x, [1, 2, 0, 3])
             x = tf.reshape(x, [-1, 16, 256])  # [batch_size, len_v, n_head * d_v]
             return x
-        #lambda 14 22 34 42 50 58
+        #lambda 14 22 25 34 42 50 58
         head = Lambda(reshape2)(head)
         outputs = self.w_o(head)
         outputs = Dropout(self.dropout)(outputs)
@@ -182,7 +184,6 @@ def GetSubMask(s):
     len_s = 16
     bs = K.shape(s)[0]
     mask = K.cumsum(tf.eye(len_s, batch_shape=[bs]), 1)
-
     return mask
 
 
@@ -211,9 +212,11 @@ class Decoder():
         self_pad_mask = Lambda(lambda x: GetPadMask(x, x))(tgt_seq)
         # lambda 14 22 24 34 42 50 58    ------------->none 24
         self_sub_mask = Lambda(GetSubMask)(tgt_seq)
-
+        #lambda 25
         self_mask = Lambda(lambda x: K.minimum(x[0], x[1]))([self_pad_mask, self_sub_mask])
+        #lambda 26
         enc_mask = Lambda(lambda x: GetPadMask(x[0], x[1]))([tgt_seq, src_seq])
+
         if return_att: self_atts, enc_atts = [], []
         for dec_layer in self.layers[:active_layers]:
             x, self_att, enc_att = dec_layer(x, enc_output, self_mask, enc_mask)
@@ -396,7 +399,6 @@ class LRSchedulerPerStep(Callback):
 
 
 add_layer = Lambda(lambda x: x[0] + x[1], output_shape=lambda x: x[0])
-
 # use this because keras may get wrong shapes with Add()([])
 
 if __name__ == '__main__':
