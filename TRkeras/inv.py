@@ -101,25 +101,32 @@ for method, kws in zip(methods, kwargs):
 test_sample_indices = [97, 175, 300, 686, 754, 543]
 # a variable to store analysis results.
 maxlen = 17
-analysis = np.zeros([len(test_sample_indices), len(analyzers), 1, maxlen])
+#analysis = np.zeros([len(test_sample_indices), len(analyzers), 1, maxlen])
+all_setences_analysis = []
 for i, ridx in enumerate(test_sample_indices):
     source_seq = [Xtest[ridx]]
     decoded_tokens = []
     target_seq = np.zeros((1, maxlen), dtype='int32')
     target_seq[0, 0] = s2s.o_tokens.startid()
-    for j in range(s2s.len_limit - 1):
+    analysis_allstep = []
+    for j in range(16):
         output = s2s.permodel[j].predict_on_batch([source_seq,target_seq])
+        analysis_perstep = []
         for aidx, analyzer in enumerate(analyzers):
-            wwwww = analyzer[j].analyze([source_seq,target_seq])
             a = analyzer[j].analyze([source_seq,target_seq])
-            #a = np.sum(a, axis=1)
-            print(a)
+            a = np.sum(a, axis=1)#step j analyzer[aidx]'s analysis
+            analysis_perstep.append(a) #step j analyzer[aidx]'s analysis was appended to step j all_analyzers's analysis
             print("------------------------------------------------------------------")
-            #analysis[i, aidx] = a
+            #analysis[j, aidx] = a
+        print(len(analysis_perstep))
+        analysis_allstep.append(analysis_perstep)
         sampled_index = np.argmax(output[0])
         sampled_token = s2s.o_tokens.token(sampled_index)
         decoded_tokens.append(sampled_token)
         if sampled_index == s2s.o_tokens.endid(): break
         target_seq[0, j + 1] = sampled_index
-    print(decoded_tokens)
+    print(len(analysis_allstep))
+    #print(decoded_tokens)
+    all_setences_analysis.append(analysis_allstep)
+print(len(all_setences_analysis))
 
