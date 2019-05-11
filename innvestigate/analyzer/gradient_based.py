@@ -161,8 +161,11 @@ class InputTimesGradient(Gradient):
         super(InputTimesGradient, self).__init__(model, **kwargs)
 
     def _create_analysis(self, model, stop_analysis_at_tensors=[]):
-        tensors_to_analyze = [x for x in iutils.to_list(model.inputs)
-                              if x not in stop_analysis_at_tensors]
+        if len(self._tensor_to_analyze) != 0:
+            tensors_to_analyze = self._tensor_to_analyze
+        else:
+            tensors_to_analyze = [x for x in iutils.to_list(model.inputs)
+                                  if x not in stop_analysis_at_tensors]
         gradients = super(InputTimesGradient, self)._create_analysis(
             model, stop_analysis_at_tensors=stop_analysis_at_tensors)
         return [keras.layers.Multiply()([i, g])
