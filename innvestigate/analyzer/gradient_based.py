@@ -112,6 +112,9 @@ class Gradient(base.ReverseAnalyzerBase):
 
         super(Gradient, self).__init__(model, **kwargs)
 
+    def _create_analysis(self, *args, **kwargs):
+        return super(Gradient, self)._create_analysis(*args, **kwargs)
+
     def _head_mapping(self, X):
         return ilayers.OnesLike()(X)
 

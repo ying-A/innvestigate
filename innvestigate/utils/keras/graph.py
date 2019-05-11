@@ -889,6 +889,7 @@ def reverse_model(model, reverse_mappings,
         tmp = zip(tensors_list, reversed_tensors_list)
         for i, (X, reversed_X) in enumerate(tmp):
             add_reversed_tensor(i, X, reversed_X)
+            _print('[Info] Add {}'.format(X))
 
     def get_reversed_tensor(tensor):
         tmp = reversed_tensors[tensor]
@@ -978,6 +979,7 @@ def reverse_model(model, reverse_mappings,
                 # Nothing meta here
                 reverse_mapping = meta_reverse_mapping
 
+        _print("[Info] Apply {} to {}.".format(reverse_mapping, layer.name))
         initialized_reverse_mappings[layer] = reverse_mapping
 
     if project_bottleneck_tensors:
@@ -994,6 +996,7 @@ def reverse_model(model, reverse_mappings,
 
     # Follow the list and revert the graph.
     for _nid, (layer, Xs, Ys) in enumerate(reverse_execution_list):
+        _print('[Info] revert {}.'.format(layer.name))
         nid = len_execution_list_wo_inputs_layers - _nid - 1
 
         if isinstance(layer, keras.layers.InputLayer):
@@ -1017,16 +1020,23 @@ def reverse_model(model, reverse_mappings,
 
             _print("  [NID: {}] Reverse layer-node {}".format(nid, layer))
             reverse_mapping = initialized_reverse_mappings[layer]
-            reversed_Xs = reverse_mapping(
-                Xs, Ys, reversed_Ys,
-                {
-                    "nid": nid,
-                    "model": model,
-                    "layer": layer,
-                    "stop_mapping_at_tensors": local_stop_mapping_at_tensors,
-                })
-            reversed_Xs = iutils.to_list(reversed_Xs)
-            add_reversed_tensors(nid, Xs, reversed_Xs)
+            try:
+                reversed_Xs = reverse_mapping(
+                    Xs, Ys, reversed_Ys,
+                    {
+                        "nid": nid,
+                        "model": model,
+                        "layer": layer,
+                        "stop_mapping_at_tensors": local_stop_mapping_at_tensors,
+                    })
+                reversed_Xs = iutils.to_list(reversed_Xs)
+                add_reversed_tensors(nid, Xs, reversed_Xs)
+            except Exception as e:
+                #print('[Warning] Skip Layer {}, for {}.'.format(layer.name, str(e)))
+                #if layer.name == 'lambda_2':
+                #    from IPython import embed
+                #    embed()
+                pass
 
     # Return requested values #################################################
     reversed_input_tensors = [get_reversed_tensor(tmp)
