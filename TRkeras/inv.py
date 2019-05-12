@@ -127,16 +127,18 @@ with open ('./Data8k/gen_accu_maxdecode.txt', 'w') as fgen:
 '''
 tensor_to_analyze = [s2s.src_emb,s2s.tgt_emb,s2s.src_pos_emb,s2s.tgt_pos_emb]
 '''
-methods = ["gradient.baseline",
+methods = ["input_t_gradient",
+           "gradient.baseline",
            "gradient",
-           "input_t_gradient",
+           "random",
            "lrp.epsilon"]
-kwargs = [{'tensor_to_analyze':tensor_to_analyze,'methodtype_input':False},
+kwargs = [{'tensor_to_analyze':tensor_to_analyze,'methodtype_input':True},
           {'tensor_to_analyze':tensor_to_analyze,'methodtype_input':False},
-          {'tensor_to_analyze':tensor_to_analyze,'methodtype_input':True},
-          {'tensor_to_analyze':tensor_to_analyze,'methodtype_input':False}]
+          {'tensor_to_analyze':tensor_to_analyze,'methodtype_input':False},
+          {'tensor_to_analyze':tensor_to_analyze,'methodtype_input':False},
+          {'tensor_to_analyze':tensor_to_analyze,'methodtype_input':False},]
 '''
-methods = ["deep_taylor"]
+methods = ["gradient"]
 kwargs = [{'tensor_to_analyze':tensor_to_analyze,'methodtype_input':False}]
 allmethods = [
     # Utility.
@@ -222,7 +224,7 @@ for i, ridx in enumerate(test_sample_indices):
             a = np.squeeze(a)#squeeze
             if a.ndim==2:
                 a = np.sum(a, axis=1)#step j analyzer[aidx]'s analysis
-            print(a)
+            #print(a)
             analysis_perstep.append(a) #step j analyzer[aidx]'s analysis was appended to step j all_analyzers's analysis
             #print("------------------------------------------------------------------")
             #analysis[j, aidx] = a
@@ -242,7 +244,6 @@ for i, ridx in enumerate(test_sample_indices):
 sentences_nums = len(all_setences_analysis)
 sentence_length = len(all_setences_analysis[0])
 method_nums = len(all_setences_analysis[0][0])
-'''
 for i,idx in enumerate(test_sample_indices):
     source_words = [s2s.i_tokens.token(srcword_id) for srcword_id in Xtest[idx]]
     print('Review(id=%d): %s' % (idx, ' '.join(source_words)))
@@ -257,4 +258,3 @@ for i,idx in enumerate(test_sample_indices):
         for k, method in enumerate(methods):
             plot_text_heatmap(source_words, all_setences_analysis[i][j][k].reshape(-1), title='Method: %s' % method, verbose=0)
             plt.show()
-'''
