@@ -301,7 +301,8 @@ class DeepLIFTWrapper(base.AnalyzerNetworkBase):
             "rescale": modes.Rescale,
         }[key]
 
-        with tempfile.NamedTemporaryFile(suffix=".hdf5") as f:
+        #with tempfile.NamedTemporaryFile(suffix=".hdf5") as f:
+        with open("C:/Users/trio/Desktop/deepliftmodel.hdf5",'w') as f:
             self._model.save(f.name)
             deeplift_model = kc.convert_model_from_saved_files(
                 f.name, nonlinear_mxts_mode=nonlinear_mxts_mode,
