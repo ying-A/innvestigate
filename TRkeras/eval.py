@@ -1,4 +1,4 @@
-from TRkeras.Data8k import dataloader as dd
+from TRkeras.Data8klevel2 import dataloader as dd
 from keras.optimizers import *
 from keras.callbacks import *
 import matplotlib.pyplot as plt
@@ -53,34 +53,34 @@ def plot_text_heatmap(words, scores, title="", width=10, height=0.2, verbose=0, 
 
     if verbose == 0:
         ax.axis('off')
-dict_file = './Data8k/vocab.txt'
+dict_file = './Data8klevel2/vocab.txt'
 itokens, otokens = dd.MakeS2SDict(dict_file)
-Xtrain, Ytrain = dd.MakeS2SData('./Data8k/trainsrc.txt',
-                                './Data8k/traintgt.txt',
+Xtrain, Ytrain = dd.MakeS2SData('./Data8klevel2/trainsrc.txt',
+                                './Data8klevel2/traintgt.txt',
                                 itokens, otokens,
-                                h5_file='./Data8k/train_en2de.h5')
-Xvalid, Yvalid = dd.MakeS2SData('./Data8k/valsrc.txt',
-                                './Data8k/valtgt.txt',
+                                h5_file='./Data8klevel2/train_en2de.h5')
+Xvalid, Yvalid = dd.MakeS2SData('./Data8klevel2/valsrc.txt',
+                                './Data8klevel2/valtgt.txt',
                                 itokens, otokens,
-                                h5_file='./Data8k/val_en2de.h5')
-Xtest, Ytest = dd.MakeS2SData('./Data8k/testsrc.txt',
-                                './Data8k/testtgt.txt',
+                                h5_file='./Data8klevel2/val_en2de.h5')
+Xtest, Ytest = dd.MakeS2SData('./Data8klevel2/testsrc.txt',
+                                './Data8klevel2/testtgt.txt',
                                 itokens, otokens,
-                                h5_file='./Data8k/test_en2de.h5')
+                                h5_file='./Data8klevel2/test_en2de.h5')
 X = []
-with open("./Data8k/testsrc.txt", "r") as fsrc:
+with open("./Data8klevel2/testsrc.txt", "r") as fsrc:
     line = fsrc.readline()
     while (line != ""):
         X.append(line)
         line = fsrc.readline()
 Y = []
-with open('./Data8k/testtgt.txt', 'r') as ftgt:
+with open('./Data8klevel2/testtgt.txt', 'r') as ftgt:
     line = ftgt.readline()
     while (line != ""):
         Y.append(line)
         line = ftgt.readline()
 
-acclog = open('./Data8k/gardient_valid_log.txt','a')
+acclog = open('./Data8klevel2/gardient_valid_log.txt','a')
 path = "C:\\Users\\trio\\innvestigate\\TRkeras\\models"
 mfiles = []
 dirfiles = os.listdir(path)
@@ -101,7 +101,7 @@ for mfile in mfiles:
     for i in range(3):
         rets.append(s2s.decode_sequence(en[i], delimiter=' '))
     acc = []
-    with open ('./Data8k/gen_accu_maxdecode.txt', 'w') as fgen:
+    with open ('./Data8klevel2/gen_accu_maxdecode.txt', 'w') as fgen:
         for i in range(len(rets)):
             pred = rets[i].split()
             true = Y[i].split()
