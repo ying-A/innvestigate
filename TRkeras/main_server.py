@@ -1,18 +1,18 @@
-from TRkeras.Data8k import dataloader as dd
+from TRkeras.Data8klevel2 import dataloader as dd
 from keras.optimizers import *
 from keras.callbacks import *
 from keras.utils.vis_utils import plot_model
 
-dict_file = './Data8k/vocab.txt'
+dict_file = './Data8klevel2/vocab.txt'
 itokens, otokens = dd.MakeS2SDict(dict_file)
-Xtrain, Ytrain = dd.MakeS2SData('./Data8k/trainsrc.txt',
-                                './Data8k/traintgt.txt',
+Xtrain, Ytrain = dd.MakeS2SData('./Data8klevel2/trainsrc.txt',
+                                './Data8klevel2/traintgt.txt',
                                 itokens, otokens,
-                                h5_file='./Data8k/train_en2de.h5')
-Xvalid, Yvalid = dd.MakeS2SData('./Data8k/valsrc.txt',
-                                './Data8k/valtgt.txt',
+                                h5_file='./Data8klevel2/train_en2de.h5')
+Xvalid, Yvalid = dd.MakeS2SData('./Data8klevel2/valsrc.txt',
+                                './Data8klevel2/valtgt.txt',
                                 itokens, otokens,
-                                h5_file='./Data8k/val_en2de.h5')
+                                h5_file='./Data8klevel2/val_en2de.h5')
 print('seq 1 words:', itokens.num())
 print('seq 2 words:', otokens.num())
 print('train shapes:', Xtrain.shape, Ytrain.shape)
@@ -38,13 +38,13 @@ except:
 
 if 'test' in sys.argv:
     X = []
-    with open("./Data8k/testsrc.txt", "r") as fsrc:
+    with open("./Data8klevel2/testsrc.txt", "r") as fsrc:
         line = fsrc.readline()
         while (line != ""):
             X.append(line)
             line = fsrc.readline()
     Y = []
-    with open('./Data8k/testtgt.txt', 'r') as ftgt:
+    with open('./Data8klevel2/testtgt.txt', 'r') as ftgt:
         line = ftgt.readline()
         while (line != ""):
             Y.append(line)
@@ -55,7 +55,7 @@ if 'test' in sys.argv:
     for i in range(3):
         rets.append(s2s.decode_sequence(en[i], delimiter=' '))
     acc = []
-    with open ('./Data8k/gen_accu_maxdecode.txt', 'w') as fgen:
+    with open ('./Data8klevel2/gen_accu_maxdecode.txt', 'w') as fgen:
         for i in range(len(rets)):
             pred = rets[i].split()
             true = Y[i].split()
