@@ -1032,7 +1032,7 @@ def reverse_model(model, reverse_mappings,
                 reversed_Xs = iutils.to_list(reversed_Xs)
                 add_reversed_tensors(nid, Xs, reversed_Xs)
             except Exception as e:
-                #print('[Warning] Skip Layer {}, for {}.'.format(layer.name, str(e)))
+                _print('[Warning] Skip Layer {}, for {}.'.format(layer.name, str(e)))
                 #if layer.name == 'lambda_2':
                 #    from IPython import embed
                 #    embed()
