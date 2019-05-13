@@ -227,7 +227,6 @@ for i, ridx in enumerate(test_sample_indices):
             #print(a)
             analysis_perstep.append(a) #step j analyzer[aidx]'s analysis was appended to step j all_analyzers's analysis
             #print("------------------------------------------------------------------")
-            #analysis[j, aidx] = a
         #print(len(analysis_perstep))
         analysis_allstep.append(analysis_perstep)
         sampled_index = np.argmax(output[0])
