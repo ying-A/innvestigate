@@ -80,13 +80,15 @@ with open('./Data8k/testtgt.txt', 'r') as ftgt:
         Y.append(line)
         line = ftgt.readline()
 
+acclog = open('./Data8k/gardient_valid_log.txt','a')
 path = "C:\\Users\\trio\\innvestigate\\TRkeras\\models"
 mfiles = []
 dirfiles = os.listdir(path)
 for x in dirfiles:
    mfiles.append(os.path.join(path,x))
 iii = 0
-invacc = []
+invs_acc = []
+ys_pre_acc = []
 d_model = 256
 s2s = Transformer(itokens, otokens, len_limit=70, d_model=d_model, d_inner_hid=512,n_head=8, layers=2, dropout=0.1)
 s2s.compile(Adam(0.001, 0.9, 0.98, epsilon=1e-9))
@@ -177,9 +179,6 @@ for mfile in mfiles:
         "pattern.net",
         "pattern.attribution",
     ]
-
-    method = 'gradient'
-
     analyzers = []
     for method, kws in zip(methods, kwargs):
         an = []
@@ -200,7 +199,7 @@ for mfile in mfiles:
 
 
 
-    for i in range(100):
+    for i in range(len(Xvalid)):
         source_seq = [Xvalid[i]]
         source_words = [s2s.i_tokens.token(srcword_id) for srcword_id in Xvalid[i]]
         #print("X",source_words)
@@ -233,9 +232,8 @@ for mfile in mfiles:
                 if a.ndim==2:
                     a = np.sum(a, axis=1)#step j analyzer[aidx]'s analysis
                 #print(a)
-                if method in ['gradient','gradient.baseline']:
+                if methods[0] in ['gradient','gradient.baseline']:
                     a = abs(a)
-
                 b = a.tolist()
                 index_in_source_sentence_0 = list(map(b.index, heapq.nlargest(2, b)))[0]
                 index_in_source_sentence_1 = list(map(b.index, heapq.nlargest(2, b)))[1]
@@ -274,9 +272,26 @@ for mfile in mfiles:
 
         #all_decoded_sentences.append(decoded_tokens)
         #all_setences_analysis.append(analysis_allstep)
-    print("epoch",iii)
-    print(y2x_inv_right_cnt/y_pre_right_cnt)
-    invacc.append(y2x_inv_right_cnt/y_pre_right_cnt)
+    y_pre_acc = y_pre_right_cnt / 100 * 10  # num_sens * sen_len
+    y2x_inv_acc = y2x_inv_right_cnt/y_pre_right_cnt
+    invs_acc.append(y2x_inv_acc)
+    ys_pre_acc.append(y_pre_acc)
+    print("epoch", iii)
+    print("y_pre_acc", y_pre_acc)
+    print("y2x_inv_acc", y2x_inv_acc)
+    acclog.write(str(iii)+" "+str(y_pre_acc)+" "+str(y2x_inv_acc)+"\n")
     iii +=1
-print(invacc)
+
+print(invs_acc)
+'''
+title = ""
+plt.title("Method:Gradient", fontsize=24)
+plt.xlabel("epoch", fontsize=14)
+plt.ylabel("acc", fontsize=14)
+epoch = [i for i in range(40)]
+plt.plot(epoch, ys_pre_acc, label="ys_pre_acc")
+plt.plot(epoch, invs_acc, label="invs_acc")
+plt.legend()
+plt.show()
+'''
 
