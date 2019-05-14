@@ -738,14 +738,14 @@ class ReverseAnalyzerBase(AnalyzerNetworkBase):
             ReversePassLayer,
             name="pass",
         )
-        if not self._methodtype_input:
+        if  self._methodtype_input:
             self._add_conditional_reverse_mapping(
                 kchecks.is_embedding,
                 ReverseEmbeddingLayer,
              name="sum_of_embedding",
             )
 
-        if self._methodtype_input:
+        if not  self._methodtype_input:
             self._add_conditional_reverse_mapping(
                 kchecks.is_embedding,
                 ReverseEmbeddingAsInputLayer,

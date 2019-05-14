@@ -1,4 +1,5 @@
 import os, sys, time, random
+sys.path.append("..")
 import ljqpy
 import h5py
 import numpy as np
@@ -35,8 +36,8 @@ def pad_to_length(xs, tokens, length = 999):
 		for j, z in enumerate(x):
 			X[i,1+j] = tokens.id(z)
 		X[i,1+len(x)] = tokens.endid()
-	print(X[0])
-	print(X[1])
+	#print(X[0])
+	#print(X[1])
 	return X
 
 
@@ -67,7 +68,9 @@ def MakeS2SData(source_path,target_path, itokens=None, otokens=None, h5_file=Non
 			Xs[1].append(line.split())
 			line = ftgt.readline()
 	print("DONE")
-	X, Y = pad_to_longest(Xs[0], itokens, max_len), pad_to_length(Xs[1], otokens, 17)
+	X, Y = pad_to_length(Xs[0], itokens, 16), pad_to_length(Xs[1], otokens, 17)
+	print(X[0])
+	print(Y[0])
 	if h5_file is not None:
 		with h5py.File(h5_file, 'w') as dfile:
 			dfile.create_dataset('X', data=X)
@@ -87,10 +90,10 @@ def S2SDataGenerator(fn, itokens, otokens, batch_size=64, delimiter=' ', max_len
 				Xs = [[], []]
 
 if __name__ == '__main__':
-	dict_file = 'C:/Users/trio/Desktop/TRkeras/Data8k/vocab.txt'
+	dict_file = 'C:/Users/trio/innvestigate/TRkeras/Data8klevel1/vocab.txt'
 	itokens, otokens = MakeS2SDict(dict_file)
-	X, Y = MakeS2SData('C:/Users/trio/Desktop/TRkeras/Data8k/trainsrc.txt',
-					   'C:/Users/trio/Desktop/TRkeras/Data8k/traintgt.txt',
+	X, Y = MakeS2SData('C:/Users/trio/innvestigate/TRkeras/Data8klevel1/trainsrc.txt',
+					   'C:/Users/trio/innvestigate/TRkeras/Data8klevel1/traintgt.txt',
 					   itokens, otokens,
-					   h5_file='C:/Users/trio/Desktop/TRkeras/Data8k/train_en2de.h5')
+					   h5_file='C:/Users/trio/innvestigate/TRkeras/Data8klevel1/train_en2de.h5')
 	print(X.shape, Y.shape)

@@ -1,20 +1,20 @@
 import sys
 sys.path.append("..")
-from Data8klevel2 import dataloader as dd
+from TRkeras.Data8klevel1 import dataloader as dd
 from keras.optimizers import *
 from keras.callbacks import *
 from keras.utils.vis_utils import plot_model
 
-dict_file = './Data8klevel2/vocab.txt'
+dict_file = './Data8klevel1/vocab.txt'
 itokens, otokens = dd.MakeS2SDict(dict_file)
-Xtrain, Ytrain = dd.MakeS2SData('./Data8klevel2/trainsrc.txt',
-                                './Data8klevel2/traintgt.txt',
+Xtrain, Ytrain = dd.MakeS2SData('./Data8klevel1/trainsrc.txt',
+                                './Data8klevel1/traintgt.txt',
                                 itokens, otokens,
-                                h5_file='./Data8klevel2/train_en2de.h5')
-Xvalid, Yvalid = dd.MakeS2SData('./Data8klevel2/valsrc.txt',
-                                './Data8klevel2/valtgt.txt',
+                                h5_file='./Data8klevel1/train_en2de.h5')
+Xvalid, Yvalid = dd.MakeS2SData('./Data8klevel1/valsrc.txt',
+                                './Data8klevel1/valtgt.txt',
                                 itokens, otokens,
-                                h5_file='./Data8klevel2/val_en2de.h5')
+                                h5_file='./Data8klevel1/val_en2de.h5')
 print('seq 1 words:', itokens.num())
 print('seq 2 words:', otokens.num())
 print('train shapes:', Xtrain.shape, Ytrain.shape)
@@ -27,7 +27,7 @@ d_model = 256
 s2s = Transformer(itokens, otokens, len_limit=70, d_model=d_model, d_inner_hid=512, \
                   n_head=8, layers=2, dropout=0.1)
 
-mfile = './models/ckpt-{epoch:02d}-val_accu_{val_accu:.5f}.h5'
+mfile = './models1to1/ckpt-{epoch:02d}-val_accu_{val_accu:.5f}.h5'
 
 lr_scheduler = LRSchedulerPerStep(d_model, 4000)
 model_saver = ModelCheckpoint(mfile, save_weights_only=True,period=1)
@@ -40,13 +40,13 @@ except:
 
 if 'test' in sys.argv:
     X = []
-    with open("./Data8klevel2/testsrc.txt", "r") as fsrc:
+    with open("./Data8klevel1/testsrc.txt", "r") as fsrc:
         line = fsrc.readline()
         while (line != ""):
             X.append(line)
             line = fsrc.readline()
     Y = []
-    with open('./Data8klevel2/testtgt.txt', 'r') as ftgt:
+    with open('./Data8klevel1/testtgt.txt', 'r') as ftgt:
         line = ftgt.readline()
         while (line != ""):
             Y.append(line)
@@ -57,7 +57,7 @@ if 'test' in sys.argv:
     for i in range(3):
         rets.append(s2s.decode_sequence(en[i], delimiter=' '))
     acc = []
-    with open ('./Data8klevel2/gen_accu_maxdecode.txt', 'w') as fgen:
+    with open ('./Data8klevel1/gen_accu_maxdecode.txt', 'w') as fgen:
         for i in range(len(rets)):
             pred = rets[i].split()
             true = Y[i].split()

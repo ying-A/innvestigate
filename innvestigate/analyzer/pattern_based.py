@@ -150,6 +150,7 @@ class PatternNet(base.OneEpochTrainerMixin, base.ReverseAnalyzerBase):
              "convolutional neural networks."),
             check_type="warning",
         )
+        '''
         self._add_model_check(
             lambda layer: not isinstance(layer,
                                          SUPPORTED_LAYER_PATTERNNET),
@@ -157,7 +158,7 @@ class PatternNet(base.OneEpochTrainerMixin, base.ReverseAnalyzerBase):
              "conv2d/max-pooling/dense layers."),
             check_type="exception",
         )
-
+        '''
         self._patterns = patterns
         if self._patterns is not None:
             # copy pattern references

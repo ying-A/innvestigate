@@ -8,7 +8,7 @@ import tensorflow as tf
 
 try:
 	from tqdm import tqdm
-	from Data8k.dataloader import TokenList, pad_to_longest
+	from Data8klevel2.dataloader import TokenList, pad_to_longest
 	# for transformer
 except: pass
 

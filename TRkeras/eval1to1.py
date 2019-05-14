@@ -1,4 +1,4 @@
-from TRkeras.Data8klevel2 import dataloader as dd
+from TRkeras.Data8klevel1 import dataloader as dd
 from keras.optimizers import *
 from keras.callbacks import *
 import matplotlib.pyplot as plt
@@ -53,35 +53,35 @@ def plot_text_heatmap(words, scores, title="", width=10, height=0.2, verbose=0, 
 
     if verbose == 0:
         ax.axis('off')
-dict_file = './Data8klevel2/vocab.txt'
+dict_file = './Data8klevel1/vocab.txt'
 itokens, otokens = dd.MakeS2SDict(dict_file)
-Xtrain, Ytrain = dd.MakeS2SData('./Data8klevel2/trainsrc.txt',
-                                './Data8klevel2/traintgt.txt',
+Xtrain, Ytrain = dd.MakeS2SData('./Data8klevel1/trainsrc.txt',
+                                './Data8klevel1/traintgt.txt',
                                 itokens, otokens,
-                                h5_file='./Data8klevel2/train_en2de.h5')
-Xvalid, Yvalid = dd.MakeS2SData('./Data8klevel2/valsrc.txt',
-                                './Data8klevel2/valtgt.txt',
+                                h5_file='./Data8klevel1/train_en2de.h5')
+Xvalid, Yvalid = dd.MakeS2SData('./Data8klevel1/valsrc.txt',
+                                './Data8klevel1/valtgt.txt',
                                 itokens, otokens,
-                                h5_file='./Data8klevel2/val_en2de.h5')
-Xtest, Ytest = dd.MakeS2SData('./Data8klevel2/testsrc.txt',
-                                './Data8klevel2/testtgt.txt',
+                                h5_file='./Data8klevel1/val_en2de.h5')
+Xtest, Ytest = dd.MakeS2SData('./Data8klevel1/testsrc.txt',
+                                './Data8klevel1/testtgt.txt',
                                 itokens, otokens,
-                                h5_file='./Data8klevel2/test_en2de.h5')
+                                h5_file='./Data8klevel1/test_en2de.h5')
 X = []
-with open("./Data8klevel2/testsrc.txt", "r") as fsrc:
+with open("./Data8klevel1/testsrc.txt", "r") as fsrc:
     line = fsrc.readline()
     while (line != ""):
         X.append(line)
         line = fsrc.readline()
 Y = []
-with open('./Data8klevel2/testtgt.txt', 'r') as ftgt:
+with open('./Data8klevel1/testtgt.txt', 'r') as ftgt:
     line = ftgt.readline()
     while (line != ""):
         Y.append(line)
         line = ftgt.readline()
 
-acclog = open('./Data8klevel2/gardient_valid_log.txt','a')
-path = "C:\\Users\\trio\\innvestigate\\TRkeras\\models"
+acclog = open('./Data8klevel1/gardient_valid_log.txt','a')
+path = "C:\\Users\\trio\\innvestigate\\TRkeras\\models1to1"
 mfiles = []
 dirfiles = os.listdir(path)
 for x in dirfiles:
@@ -101,7 +101,7 @@ for mfile in mfiles:
     for i in range(3):
         rets.append(s2s.decode_sequence(en[i], delimiter=' '))
     acc = []
-    with open ('./Data8klevel2/gen_accu_maxdecode.txt', 'w') as fgen:
+    with open ('./Data8klevel1/gen_accu_maxdecode.txt', 'w') as fgen:
         for i in range(len(rets)):
             pred = rets[i].split()
             true = Y[i].split()
@@ -182,7 +182,7 @@ for mfile in mfiles:
     analyzers = []
     for method, kws in zip(methods, kwargs):
         an = []
-        for j in range(16):
+        for j in range(13):
             #plot_model(s2s.permodel[j],to_file="./modelpng/permodel_%d.png"%j,show_layer_names=True,show_shapes=True)
             analyzer = innvestigate.create_analyzer(method, s2s.permodel[j], **kws)
             analyzer.fit([Xtrain,Ytrain], batch_size=64, verbose=1)
@@ -199,7 +199,7 @@ for mfile in mfiles:
 
 
 
-    for i in range(len(Xvalid)):
+    for i in range(200):
         source_seq = [Xvalid[i]]
         source_words = [s2s.i_tokens.token(srcword_id) for srcword_id in Xvalid[i]]
         #print("X",source_words)
@@ -254,25 +254,11 @@ for mfile in mfiles:
                         y2x_inv_step_pred_0 = int(y2x_inv_step_pred_0)
                         if y2x_inv_step_pred_0==y2x_inv_step_true_0:
                             y2x_inv_right_cnt += 1
-                elif (int(y_pred_step)>=400 and int(y_pred_step)<=499):
-                    y2x_inv_step_true_0 = int(y_pred_step)-400
-                    y2x_inv_step_true_1 = y2x_inv_step_true_0 + 100
-                    #print("y2x_inv_step_true_0", y2x_inv_step_true_0)
-                    #print("y2x_inv_step_pred_0", y2x_inv_step_pred_0)
-                    #print("y2x_inv_step_true_1", y2x_inv_step_true_1)
-                    #print("y2x_inv_step_pred_1", y2x_inv_step_pred_1)
-                    if y2x_inv_step_pred_0 != "<S>" and y2x_inv_step_pred_0 != "</S>" and y2x_inv_step_pred_1 != "<S>" and y2x_inv_step_pred_1 != "</S>":
-                        y2x_inv_step_pred_0 = int(y2x_inv_step_pred_0)
-                        y2x_inv_step_pred_1 = int(y2x_inv_step_pred_1)
-                        if y2x_inv_step_pred_0==y2x_inv_step_true_0 and y2x_inv_step_pred_1==y2x_inv_step_true_1:
-                            y2x_inv_right_cnt += 1
-                        elif y2x_inv_step_pred_0==y2x_inv_step_true_1 and y2x_inv_step_pred_1==y2x_inv_step_true_0:
-                            y2x_inv_right_cnt += 1
             target_seq[0, j + 1] = y_pred_step_tokenid
 
         #all_decoded_sentences.append(decoded_tokens)
         #all_setences_analysis.append(analysis_allstep)
-    y_pre_acc = y_pre_right_cnt / 1000 * 10  # num_sens * sen_len
+    y_pre_acc = y_pre_right_cnt / (200 * 10)  # num_sens * sen_len
     y2x_inv_acc = y2x_inv_right_cnt/y_pre_right_cnt
     invs_acc.append(y2x_inv_acc)
     ys_pre_acc.append(y_pre_acc)

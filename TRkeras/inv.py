@@ -1,4 +1,6 @@
-from TRkeras.Data8klevel2 import dataloader as dd
+import sys
+sys.path.append("..")
+from Data8klevel2 import dataloader as dd
 from keras.optimizers import *
 from keras.callbacks import *
 import matplotlib.pyplot as plt
@@ -79,7 +81,7 @@ d_model = 256
 s2s = Transformer(itokens, otokens, len_limit=70, d_model=d_model, d_inner_hid=512, \
                   n_head=8, layers=2, dropout=0.1)
 
-mfile = './models/8kmodel.h5'
+mfile = './models/ckpt-40-val_accu_0.99527.h5'
 
 lr_scheduler = LRSchedulerPerStep(d_model, 4000)
 model_saver = ModelCheckpoint(mfile, save_best_only=True, save_weights_only=True)
@@ -138,8 +140,9 @@ kwargs = [{'tensor_to_analyze':tensor_to_analyze,'methodtype_input':True},
           {'tensor_to_analyze':tensor_to_analyze,'methodtype_input':False},
           {'tensor_to_analyze':tensor_to_analyze,'methodtype_input':False},]
 '''
-methods = ["gradient"]
-kwargs = [{'tensor_to_analyze':tensor_to_analyze,'methodtype_input':False}]
+methods = ["integrated_gradients"]
+kwargs = [{}]
+#kwargs = [{'tensor_to_analyze':tensor_to_analyze,'methodtype_input':False}]
 allmethods = [
     # Utility.
     "input",
@@ -209,6 +212,7 @@ maxlen = 17
 #analysis = np.zeros([len(test_sample_indices), len(analyzers), 1, maxlen])
 all_setences_analysis = []
 all_decoded_sentences = []
+all_y2x_inv_pre_sentences = []
 for i, ridx in enumerate(test_sample_indices):
     source_seq = [Xtest[ridx]]
     decoded_tokens = []
@@ -224,7 +228,7 @@ for i, ridx in enumerate(test_sample_indices):
             a = np.squeeze(a)#squeeze
             if a.ndim==2:
                 a = np.sum(a, axis=1)#step j analyzer[aidx]'s analysis
-            #print(a)
+            print(a)
             analysis_perstep.append(a) #step j analyzer[aidx]'s analysis was appended to step j all_analyzers's analysis
             #print("------------------------------------------------------------------")
         #print(len(analysis_perstep))

@@ -361,11 +361,12 @@ class PatternComputer(object):
         import innvestigate.analyzer.pattern_based
         supported_layers = (
             innvestigate.analyzer.pattern_based.SUPPORTED_LAYER_PATTERNNET)
+        '''
         for layer in self.model.layers:
             if not isinstance(layer, supported_layers):
                 raise Exception("Model contains not supported layer: %s"
                                 % layer)
-
+        '''
         pattern_types = iutils.to_list(pattern_type)
         self.pattern_types = {k: get_pattern_class(k)
                               for k in pattern_types}

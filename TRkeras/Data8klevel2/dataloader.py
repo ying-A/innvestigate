@@ -87,10 +87,10 @@ def S2SDataGenerator(fn, itokens, otokens, batch_size=64, delimiter=' ', max_len
 				Xs = [[], []]
 
 if __name__ == '__main__':
-	dict_file = 'C:/Users/trio/Desktop/TRkeras/Data8k/vocab.txt'
+	dict_file = 'C:/Users/trio/Desktop/TRkeras/Data8klevel2/vocab.txt'
 	itokens, otokens = MakeS2SDict(dict_file)
-	X, Y = MakeS2SData('C:/Users/trio/Desktop/TRkeras/Data8k/trainsrc.txt',
-					   'C:/Users/trio/Desktop/TRkeras/Data8k/traintgt.txt',
+	X, Y = MakeS2SData('C:/Users/trio/Desktop/TRkeras/Data8klevel2/trainsrc.txt',
+					   'C:/Users/trio/Desktop/TRkeras/Data8klevel2/traintgt.txt',
 					   itokens, otokens,
-					   h5_file='C:/Users/trio/Desktop/TRkeras/Data8k/train_en2de.h5')
+					   h5_file='C:/Users/trio/Desktop/TRkeras/Data8klevel2/train_en2de.h5')
 	print(X.shape, Y.shape)
